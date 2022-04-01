@@ -4,10 +4,12 @@ import (
 	"log"
 
 	"github.com/pascallohrer/petstore/pkg/router"
+	"github.com/pascallohrer/petstore/pkg/storage"
 )
 
 func main() {
-	app := router.NewRouter()
+	repository := storage.NewMemoryPetStorage()
+	app := router.NewRouter(repository)
 
 	exitError := make(chan error)
 	go func() {

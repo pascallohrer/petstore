@@ -8,13 +8,13 @@ import (
 type Route struct {
 	Method  string
 	Path    string
-	Handler func(*fiber.Ctx) error
+	Handler func(handlers.PetStorage) func(*fiber.Ctx) error
 }
 
-func NewRouter() *fiber.App {
+func NewRouter(storage handlers.PetStorage) *fiber.App {
 	app := fiber.New()
 	for _, route := range routes {
-		app.Add(route.Method, route.Path, route.Handler)
+		app.Add(route.Method, route.Path, route.Handler(storage))
 	}
 	return app
 }
@@ -23,16 +23,16 @@ var routes = []Route{
 	{
 		Method:  "GET",
 		Path:    "/pet/:petId",
-		Handler: handlers.GetPetById,
+		Handler: handlers.GetPetByIdHandler,
 	},
 	{
 		Method:  "POST",
 		Path:    "/pet",
-		Handler: handlers.AddPet,
+		Handler: handlers.AddPetHandler,
 	},
 	{
 		Method:  "DELETE",
 		Path:    "/pet/:petId",
-		Handler: handlers.DeletePet,
+		Handler: handlers.DeletePetHandler,
 	},
 }

@@ -6,28 +6,37 @@ import (
 	"github.com/pascallohrer/petstore/pkg/entities"
 )
 
-var pets map[int64]entities.Pet
-var nextId int64 = 0
+type MemoryPetStorage struct {
+	pets   map[int64]entities.Pet
+	nextId int64
+}
 
-func GetPetById(petId int64) (entities.Pet, error) {
-	pet, exists := pets[petId]
+func NewMemoryPetStorage() *MemoryPetStorage {
+	return &MemoryPetStorage{
+		pets:   make(map[int64]entities.Pet),
+		nextId: 0,
+	}
+}
+
+func (m *MemoryPetStorage) GetPetById(petId int64) (entities.Pet, error) {
+	pet, exists := m.pets[petId]
 	if !exists {
 		return entities.Pet{}, fmt.Errorf("petId not found")
 	}
 	return pet, nil
 }
 
-func DeletePet(petId int64) error {
-	_, exists := pets[petId]
+func (m *MemoryPetStorage) DeletePet(petId int64) error {
+	_, exists := m.pets[petId]
 	if !exists {
 		return fmt.Errorf("petId not found")
 	}
-	delete(pets, petId)
+	delete(m.pets, petId)
 	return nil
 }
 
-func AddPet(newPet entities.Pet) int64 {
-	pets[nextId] = newPet
-	nextId++
-	return nextId
+func (m *MemoryPetStorage) AddPet(newPet entities.Pet) int64 {
+	m.pets[m.nextId] = newPet
+	m.nextId++
+	return m.nextId
 }
