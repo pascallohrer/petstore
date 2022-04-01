@@ -1,0 +1,7 @@
+# syntax=docker/dockerfile:1
+FROM golang:latest as BUILD
+
+WORKDIR app
+COPY . .
+
+ENTRYPOINT ["go", "test", "-v", "./...", "-coverprofile", "cover.out"]
