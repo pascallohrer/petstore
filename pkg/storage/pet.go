@@ -14,7 +14,7 @@ type MemoryPetStorage struct {
 func NewMemoryPetStorage() *MemoryPetStorage {
 	return &MemoryPetStorage{
 		pets:   make(map[int64]entities.Pet),
-		nextId: 0,
+		nextId: 1,
 	}
 }
 
@@ -36,7 +36,8 @@ func (m *MemoryPetStorage) DeletePet(petId int64) error {
 }
 
 func (m *MemoryPetStorage) AddPet(newPet entities.Pet) int64 {
+	newPet.Id = m.nextId
 	m.pets[m.nextId] = newPet
 	m.nextId++
-	return m.nextId
+	return m.nextId - 1
 }

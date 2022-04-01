@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -12,6 +11,10 @@ type PetStorage interface {
 	GetPetById(int64) (entities.Pet, error)
 	AddPet(entities.Pet) int64
 	DeletePet(int64) error
+}
+
+type addPetResponse struct {
+	PetId int64 `json:"petId"`
 }
 
 func GetPetByIdHandler(storage PetStorage) func(ctx *fiber.Ctx) error {
@@ -31,12 +34,15 @@ func GetPetByIdHandler(storage PetStorage) func(ctx *fiber.Ctx) error {
 func AddPetHandler(storage PetStorage) func(ctx *fiber.Ctx) error {
 	return func(ctx *fiber.Ctx) error {
 		var newPet entities.Pet
-		if err := ctx.BodyParser(&newPet); err != nil || !newPet.IsValid() {
+		if err := ctx.BodyParser(&newPet); err != nil {
 			return ctx.Status(fiber.StatusMethodNotAllowed).SendString(err.Error())
+		}
+		if !newPet.IsValid() {
+			return ctx.Status(fiber.StatusMethodNotAllowed).SendString("Required values missing")
 		}
 		petId := storage.AddPet(newPet)
 		// Even though the spec doesn't specify it, returning the newly added ID just makes sense
-		return ctx.JSON(fmt.Sprintf("{'petId': %d}", petId))
+		return ctx.JSON(addPetResponse{petId})
 	}
 }
 
